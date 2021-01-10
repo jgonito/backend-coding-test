@@ -1,0 +1,5 @@
+scenarios:
+  - name: "Get ride by id (id=1)"
+    flow:
+    - get:
+        url: /rides/1

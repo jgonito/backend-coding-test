@@ -1,0 +1,19 @@
+config:
+  target: "http://localhost:8010"
+  phases:
+  - duration: 30
+    arrivalCount: 100
+  ensure:
+    p99: 50
+  # create-ride specific
+  payload:
+    path: "create.ride.payload.csv"
+    skipHeader: true
+    fields:
+      - "start_lat"
+      - "start_long"
+      - "end_lat"
+      - "end_long"
+      - "rider_name"
+      - "driver_name"
+      - "driver_vehicle"

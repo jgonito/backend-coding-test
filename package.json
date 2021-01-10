@@ -10,13 +10,17 @@
     "pretest": "eslint --ignore-path .gitignore .",
     "test": "nyc npm run test:mocha",
     "test:mocha": "mocha -r dotenv/config tests",
+    "test:load": "npm run test:load-create-ride && npm run test:load-get-all-rides && npm run test:load-get-ride-by-id",
+    "test:load-create-ride": "artillery run --config tests/load-test/config.yml tests/load-test/scenarios/create.ride.yml",
+    "test:load-get-all-rides": "artillery run --config tests/load-test/config.yml tests/load-test/scenarios/get.all.rides.yml",
+    "test:load-get-ride-by-id": "artillery run --config tests/load-test/config.yml tests/load-test/scenarios/get.ride.by.id.yml",
     "start": "node -r dotenv/config index.js"
   },
   "pre-push": "test",
   "keywords": [
     "Xendit"
   ],
-  "author": "Bo",
+  "author": "Jerick Gonito",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
@@ -30,6 +34,7 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
+    "artillery": "^1.6.1",
     "eslint": "^7.17.0",
     "git-pre-push": "0.0.5",
     "mocha": "^6.1.4",
