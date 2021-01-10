@@ -1,15 +1,15 @@
 'use strict';
 
-const { logger } = require('./src/utils');
-const swaggerJSDoc = require("swagger-jsdoc");
-const swaggerUI = require("swagger-ui-express");
+(async () => {
+    const { logger } = require('./src/utils');
+    const swaggerJSDoc = require("swagger-jsdoc");
+    const swaggerUI = require("swagger-ui-express");
+    const buildSchemas = require('./src/schemas');
+    const db = await require('./src/db');
 
-const db = require('./src/db');
-const buildSchemas = require('./src/schemas');
-
-db.serialize(() => {
+    db.getDatabaseInstance().serialize();
+    
     buildSchemas(db);
-
     const app = require('./src/app')(db);
     
     const swaggerUISpecs = swaggerJSDoc({
@@ -44,4 +44,4 @@ db.serialize(() => {
 
     const port = process.env.APP_PORT;
     app.listen(port, () => logger.info(`App started and listening on port ${port}`));
-});
+})();

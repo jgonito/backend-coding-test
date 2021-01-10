@@ -1,3 +1,11 @@
-const sqlite3 = require('sqlite3').verbose();
+const sqlite3 = require('sqlite3');
+const { open } = require('sqlite');
 
-module.exports = new sqlite3.Database(process.env.DB_NAME);
+sqlite3.verbose();
+
+module.exports = (async () => {
+    return await open({
+        filename: process.env.DB_NAME,
+        driver: sqlite3.Database
+    });
+})();

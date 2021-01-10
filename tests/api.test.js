@@ -3,8 +3,6 @@
 
 const assert = require('assert');
 const request = require('supertest');
-const db = require('../src/db');
-const app = require('../src/app')(db);
 const buildSchemas = require('../src/schemas');
 const { validLat, validLong } = require('../src/utils');
 
@@ -31,13 +29,16 @@ describe('Util tests', () => {
 });
 
 describe('API tests', () => {
-    before((done) => {
-        db.serialize((err) => { 
-            if (err) {
-                return done(err);
-            }
+    let db;
+    let app;
 
+    before((done) => {
+        require('../src/db').then((_db) => {
+            db = _db;
+            db.getDatabaseInstance().serialize();
+            
             buildSchemas(db);
+            app = require('../src/app')(db);
             done();
         });
     });
@@ -109,6 +110,49 @@ describe('API tests', () => {
                     done();
                 });
         });
+        
+        it('should return a VALIDATION_ERROR (missing driver_name)', (done) => {
+            request(app)
+                .post('/rides')
+                .send({
+                    start_lat: 90,
+                    start_long: 180,
+                    end_lat: -90,
+                    end_long: -180,
+                    rider_name: 'Jane Doe'
+                })
+                .set('Accept', 'application/json')
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) return done(err);
+
+                    assert(res.body.error_code === 'VALIDATION_ERROR', `expect a 'VALIDATION_ERROR' due to invalid 'driver_name'`);
+                    done();
+                });
+        });
+        
+        it('should return a VALIDATION_ERROR (missing driver_vehicle)', (done) => {
+            request(app)
+                .post('/rides')
+                .send({
+                    start_lat: 90,
+                    start_long: 180,
+                    end_lat: -90,
+                    end_long: -180,
+                    rider_name: 'Jane Doe',
+                    driver_name: 'John Doe'
+                })
+                .set('Accept', 'application/json')
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) return done(err);
+
+                    assert(res.body.error_code === 'VALIDATION_ERROR', `expect a 'VALIDATION_ERROR' due to invalid 'driver_vehicle'`);
+                    done();
+                });
+        });
 
         it('should return the created ride', (done) => {
             request(app)
@@ -141,7 +185,9 @@ describe('API tests', () => {
     
     describe('GET /rides/', () => {
         before((done) => {
-            db.run('DELETE FROM Rides', done);
+            db.run('DELETE FROM Rides').then(() => {
+                done();
+            });
         });
 
         it('should return a RIDES_NOT_FOUND_ERROR', (done) => {
@@ -158,32 +204,43 @@ describe('API tests', () => {
         });
 
         it('should return all rides', (done) => {
+            let inserts = [];
             for (let i = 0; i < 5; i ++) {
-                let stmt = db.prepare('INSERT INTO Rides(startLat, startLong, endLat, endLong, riderName, driverName, driverVehicle) VALUES (?, ?, ?, ?, ?, ?, ?)');
-                stmt.run([
-                    90,
-                    180,
-                    -90,
-                    -180,
-                    `Rider #${i + 1}`,
-                    `Driver #${i + 1}`,
-                    `Vehicle #${i + 1}`
-                ]);
-                stmt.finalize();
+                inserts.push(db.run(
+                    `INSERT INTO Rides (
+                        startLat,
+                        startLong,
+                        endLat, endLong,
+                        riderName,
+                        driverName,
+                        driverVehicle
+                    ) VALUES (?,?,?,?,?,?,?)`,
+                    [
+                        90,
+                        180,
+                        -90,
+                        -180,
+                        `Rider #${i + 1}`,
+                        `Driver #${i + 1}`,
+                        `Vehicle #${i + 1}`
+                    ])
+                );
             }
 
-            request(app)
-                .get('/rides')
-                .expect('Content-Type', /json/)
-                .expect(200)
-                .end((err, res) => {
-                    if (err) return done(err);
+            Promise.all(inserts).then(() => {
+                request(app)
+                    .get('/rides')
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .end((err, res) => {
+                        if (err) return done(err);
 
-                    const rides = res.body;
-                    assert(rides && rides instanceof Array, `expect 'rides' to be instance of 'Array'`);
-                    assert(rides.length === 5, `expect 'rides.length' to be type '5'`);
-                    done();
-                });
+                        const rides = res.body;
+                        assert(rides && rides instanceof Array, `expect 'rides' to be instance of 'Array'`);
+                        assert(rides.length === 5, `expect 'rides.length' to be type '5'`);
+                        done();
+                    });
+            });
         });
 
         it('should return limited rides', (done) => {
