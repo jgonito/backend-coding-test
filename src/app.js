@@ -9,6 +9,56 @@ const jsonParser = bodyParser.json();
 module.exports = (db) => {
     app.get('/health', (req, res) => res.send('Healthy'));
 
+    /**
+     * @swagger
+     * /rides/:
+     *    post:
+     *      description: Create a new ride
+     *      parameters:
+     *      - in: body
+     *        name: ride
+     *        description: The ride object payload
+     *        required: true
+     *        schema:
+     *          $ref: '#/definitions/ride'
+     *      responses:
+     *        '200':
+     *          description: Request successfully executed
+     *        '500':
+     *          description: An error is encountered while creating a ride
+     * definitions:
+     *   ride:
+     *      description: The ride object payload
+     *      properties:
+     *        start_lat:
+     *          type: number
+     *          description: The start latitude
+     *          example: 13.7565
+     *        start_long:
+     *          type: number
+     *          description: The start longitude
+     *          example: 121.0583
+     *        end_lat:
+     *          type: number
+     *          description: The end latitude
+     *          example: 14.6760
+     *        end_long:
+     *          type: number
+     *          description: The end longitude
+     *          example: 121.0437
+     *        rider_name:
+     *          type: string
+     *          description: The name of the rider
+     *          example: Jane Doe
+     *        driver_name:
+     *          type: string
+     *          description: The name of the driver
+     *          example: John Doe
+     *        driver_vehicle:
+     *          type: string
+     *          description: The driver's vehicle
+     *          example: Car
+     */
     app.post('/rides', jsonParser, (req, res) => {
         const startLatitude = Number(req.body.start_lat);
         const startLongitude = Number(req.body.start_long);
@@ -76,6 +126,17 @@ module.exports = (db) => {
         });
     });
 
+    /**
+     * @swagger
+     * /rides/:
+     *    get:
+     *      description: Get all rides
+     *      responses:
+     *        '200':
+     *          description: Request successfully executed
+     *        '500':
+     *          description: An error is encountered while getting all rides
+     */
     app.get('/rides', (req, res) => {
         db.all('SELECT * FROM Rides', function (err, rows) {
             if (err) {
@@ -96,6 +157,24 @@ module.exports = (db) => {
         });
     });
 
+    /**
+     * @swagger
+     * /rides/{id}:
+     *    get:
+     *      description: Get a ride by id
+     *      parameters:
+     *      - in: path
+     *        name: id
+     *        description: The id of ride
+     *        required: true
+     *        schema:
+     *          type: integer
+     *      responses:
+     *        '200':
+     *          description: Request successfully executed
+     *        '500':
+     *          description: An error is encountered while getting a ride
+     */
     app.get('/rides/:id', (req, res) => {
         db.all(`SELECT * FROM Rides WHERE rideID='${req.params.id}'`, function (err, rows) {
             if (err) {
