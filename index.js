@@ -1,17 +1,10 @@
 'use strict';
 
-const express = require('express');
-const app = express();
-const port = 8010;
-
-const bodyParser = require('body-parser');
-const jsonParser = bodyParser.json();
-
-const db = require('./src/db');
-
+const { logger } = require('./src/utils');
 const swaggerJSDoc = require("swagger-jsdoc");
 const swaggerUI = require("swagger-ui-express");
 
+const db = require('./src/db');
 const buildSchemas = require('./src/schemas');
 
 db.serialize(() => {
@@ -50,5 +43,5 @@ db.serialize(() => {
     );
 
     const port = process.env.APP_PORT;
-    app.listen(port, () => console.log(`App started and listening on port ${port}`));
+    app.listen(port, () => logger.info(`App started and listening on port ${port}`));
 });

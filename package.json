@@ -7,9 +7,12 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha -r dotenv/config tests",
+    "pretest": "eslint --ignore-path .gitignore .",
+    "test": "nyc npm run test:mocha",
+    "test:mocha": "mocha -r dotenv/config tests",
     "start": "node -r dotenv/config index.js"
   },
+  "pre-push": "test",
   "keywords": [
     "Xendit"
   ],
@@ -21,10 +24,14 @@
     "express": "^4.16.4",
     "sqlite3": "^4.0.6",
     "swagger-jsdoc": "^6.0.1",
-    "swagger-ui-express": "^4.1.6"
+    "swagger-ui-express": "^4.1.6",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
+    "eslint": "^7.17.0",
     "mocha": "^6.1.4",
+    "nyc": "^15.1.0",
+    "pre-push": "^0.1.1",
     "supertest": "^4.0.2"
   }
 }
