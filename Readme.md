@@ -105,3 +105,4 @@ Please implement load testing to ensure your service can handle a high amount of
 
 * Navigate to http://localhost:8010/ for api documentation
 * Implement pagination on **GET /rides** (*ex: /rides?offset=0&limit=5*)
+* Add **DDoS** security by limiting POST payload to **1mb** and restrict **120** request limit per **15 minutes**
