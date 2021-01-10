@@ -29,9 +29,9 @@
   },
   "devDependencies": {
     "eslint": "^7.17.0",
+    "git-pre-push": "0.0.5",
     "mocha": "^6.1.4",
     "nyc": "^15.1.0",
-    "pre-push": "^0.1.1",
     "supertest": "^4.0.2"
   }
 }

@@ -72,14 +72,14 @@ module.exports = (db) => {
         if (!validLat(startLatitude) || !validLong(startLongitude)) {
             return res.send({
                 error_code: 'VALIDATION_ERROR',
-                message: 'Start latitude and longitude must be between -90 - 90 and -180 to 180 degrees respectively'
+                message: 'Start latitude and longitude must be between -90 to 90 and -180 to 180 degrees respectively'
             });
         }
 
         if (!validLat(endLatitude) || !validLong(endLongitude)) {
             return res.send({
                 error_code: 'VALIDATION_ERROR',
-                message: 'End latitude and longitude must be between -90 - 90 and -180 to 180 degrees respectively'
+                message: 'End latitude and longitude must be between -90 to 90 and -180 to 180 degrees respectively'
             });
         }
 
@@ -93,14 +93,14 @@ module.exports = (db) => {
         if (typeof driverName !== 'string' || driverName.length < 1) {
             return res.send({
                 error_code: 'VALIDATION_ERROR',
-                message: 'Rider name must be a non empty string'
+                message: 'Driver name must be a non empty string'
             });
         }
 
         if (typeof driverVehicle !== 'string' || driverVehicle.length < 1) {
             return res.send({
                 error_code: 'VALIDATION_ERROR',
-                message: 'Rider name must be a non empty string'
+                message: 'Driver vehicle must be a non empty string'
             });
         }
 
