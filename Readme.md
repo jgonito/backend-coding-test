@@ -104,3 +104,4 @@ Please implement load testing to ensure your service can handle a high amount of
 # Notes
 
 * Navigate to http://localhost:8010/ for api documentation
+* Implement pagination on **GET /rides** (*ex: /rides?offset=0&limit=5*)

@@ -185,6 +185,26 @@ describe('API tests', () => {
                     done();
                 });
         });
+
+        it('should return limited rides', (done) => {
+            const limit = 3;
+            request(app)
+                .get('/rides')
+                .query({
+                    offset: 0,
+                    limit
+                })
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) return done(err);
+
+                    const rides = res.body;
+                    assert(rides && rides instanceof Array, `expect 'rides' to be instance of 'Array'`);
+                    assert(rides.length === limit, `expect 'rides.length' to be type '${limit}'`);
+                    done();
+                });
+        });
     });
     
     describe('GET /rides/{id}', () => {

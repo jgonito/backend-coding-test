@@ -134,6 +134,19 @@ module.exports = (db) => {
      * /rides/:
      *    get:
      *      description: Get all rides
+     *      parameters:
+     *      - in: query
+     *        name: offset
+     *        description: The number of records to skip
+     *        example: 0
+     *        schema:
+     *          type: number
+     *      - in: query
+     *        name: limit
+     *        description: The number of records to fetch
+     *        example: 5
+     *        schema:
+     *          type: number
      *      responses:
      *        '200':
      *          description: Request successfully executed
@@ -141,7 +154,17 @@ module.exports = (db) => {
      *          description: An error is encountered while getting all rides
      */
     app.get('/rides', (req, res) => {
-        db.all('SELECT * FROM Rides', function (err, rows) {
+        let sql = 'SELECT * FROM Rides';
+        let offset = Number(req.query.offset) || 0;
+        let limit = Number(req.query.limit);
+
+        let sqlLimit = [];
+        if (limit > 0) {
+            sql += ' LIMIT ?,?'
+            sqlLimit = [offset, limit]
+        }
+
+        db.all(sql, sqlLimit, function (err, rows) {
             if (err) {
                 logger.error(err.message);
                 return res.send({
