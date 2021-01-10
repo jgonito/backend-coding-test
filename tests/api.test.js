@@ -258,7 +258,7 @@ describe('API tests', () => {
 
                     const rides = res.body;
                     assert(rides && rides instanceof Array, `expect 'rides' to be instance of 'Array'`);
-                    assert(rides.length === limit, `expect 'rides.length' to be type '${limit}'`);
+                    assert(rides.length === limit, `expect 'rides.length' to be '${limit}'`);
                     done();
                 });
         });
@@ -274,9 +274,27 @@ describe('API tests', () => {
                 .end((err, res) => {
                     if (err) return done(err);
 
-                    const ride = res.body[0];
+                    const rides = res.body;
+                    assert(rides && rides instanceof Array, `expect 'rides' to be instance of 'Array'`);
+                    assert(rides.length === 1, `expect 'rides.length' to be 1`);
+
+                    const ride = rides[0];
                     assert(ride && typeof ride === 'object', `expect 'ride' to be type 'object'`);
                     assert(ride.rideID === rideID, `expect 'ride.rideID' to be '${rideID}'`);
+                    done();
+                });
+        });
+
+        it(`should not be vulnerable to sql injection`, (done) => {
+            const sqlInjection = '0 OR 1=1;';
+            request(app)
+                .get(`/rides/${sqlInjection}`)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) return done(err);
+
+                    assert(res.body.error_code === 'RIDES_NOT_FOUND_ERROR', `expect a 'RIDES_NOT_FOUND_ERROR' due to invalid ride id`);
                     done();
                 });
         });

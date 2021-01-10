@@ -3,11 +3,18 @@
 const express = require('express');
 const app = express();
 
+const rateLimit = require("express-rate-limit");
 const bodyParser = require('body-parser');
-const jsonParser = bodyParser.json();
+const jsonParser = bodyParser.json({limit: '1mb'}); // limit payload to 1mb
 const { logger, validLat, validLong } = require('./utils');
 
 module.exports = (db) => {
+    // MAX_REQUEST requests limit in 15 minutes
+    app.use(rateLimit({
+        windowMs: 15 * 60 * 1000,
+        max: process.env.MAX_REQUEST
+    }));
+
     app.get('/health', (req, res) => res.send('Healthy'));
 
     /**
